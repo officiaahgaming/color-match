@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Match Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        #game-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        #target-color {
+            width: 100px;
+            height: 100px;
+            margin: 20px auto;
+            border-radius: 50%;
+            border: 3px solid #333;
+        }
+        #color-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .color-option {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s;
+        }
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+        #score {
+            font-size: 24px;
+            margin: 20px 0;
+        }
+        #timer {
+            font-size: 20px;
+            color: #666;
+        }
+        #start-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        #start-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>Color Match Game</h1>
+        <div id="score">Score: 0</div>
+        <div id="timer">Time: 30s</div>
+        <div id="target-color"></div>
+        <div id="color-options"></div>
+        <button id="start-btn">Start Game</button>
+    </div>
+    <script>
+        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+        let score = 0;
+        let timeLeft = 30;
+        let gameInterval;
+        let targetColor;
+
+        const scoreElement = document.getElementById('score');
+        const timerElement = document.getElementById('timer');
+        const targetColorElement = document.getElementById('target-color');
+        const colorOptionsElement = document.getElementById('color-options');
+        const startButton = document.getElementById('start-btn');
+
+        function startGame() {
+            score = 0;
+            timeLeft = 30;
+            scoreElement.textContent = `Score: ${score}`;
+            startButton.style.display = 'none';
+            updateGame();
+            gameInterval = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = `Time: ${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            clearInterval(gameInterval);
+            startButton.style.display = 'block';
+            colorOptionsElement.innerHTML = '';
+            alert(`Game Over! Your score: ${score}`);
+        }
+
+        function updateGame() {
+            // Set target color
+            targetColor = colors[Math.floor(Math.random() * colors.length)];
+            targetColorElement.style.backgroundColor = targetColor;
+
+            // Create color options
+            colorOptionsElement.innerHTML = '';
+            let options = [...colors];
+            options = options.sort(() => Math.random() - 0.5).slice(0, 4);
+            if (!options.includes(targetColor)) {
+                options[Math.floor(Math.random() * 4)] = targetColor;
+            }
+
+            options.forEach(color => {
+                const button = document.createElement('button');
+                button.className = 'color-option';
+                button.style.backgroundColor = color;
+                button.onclick = () => checkColor(color);
+                colorOptionsElement.appendChild(button);
+            });
+        }
+
+        function checkColor(selectedColor) {
+            if (selectedColor === targetColor) {
+                score += 10;
+                scoreElement.textContent = `Score: ${score}`;
+            }
+            updateGame();
+        }
+
+        startButton.onclick = startGame;
+    </script>
+</body>
+</html>
